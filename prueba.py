@@ -1,4 +1,4 @@
-tokens = ["44","<=","40"]
+tokens = ["var",":=","2","-","(","44","+","2","*","5",")"]
 ig = 0
 
 class Arbol(object):
@@ -16,6 +16,29 @@ def match(tokensActual):
             ig += 1
     else:
         error()
+
+def asignacion():
+    global ig
+    global tokens
+    nuevo = Arbol()
+    temp = Arbol()
+    temp.nombre = "Variable"
+    temp.dato = tokens[ig]
+    if ig < len(tokens)-1:
+        ig += 1
+    else:
+        error()
+    if tokens[ig] == ':=':
+        match(':=')
+        nuevo.nombre = "Asignacion"
+        nuevo.izq = temp
+        nuevo.der = expresion()
+        nuevo.dato = nuevo.der.dato
+        temp = nuevo
+        match(';')
+    else:
+        error()
+    return temp
 
 def expresion():
     global ig
@@ -174,7 +197,7 @@ def fin():
     return temp
 
 def error():
-    print("Error Sintactico")
+    print("Error Sintactico \n")
 
 def verArbol(arbol):
     if(arbol != None):
@@ -187,7 +210,7 @@ def verArbol(arbol):
 
 if __name__== "__main__":
     raiz = Arbol()
-    raiz = expresion()
-    print("Resultado: " + str(raiz.dato))
+    raiz = asignacion()
+    print("Resultado: " + str(raiz.dato) + "\n")
     verArbol(raiz)
     
