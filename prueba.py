@@ -1,4 +1,4 @@
-token = ["44","+","2","*","5"]
+tokens = ["44","<=","40"]
 ig = 0
 
 class Arbol(object):
@@ -8,22 +8,90 @@ class Arbol(object):
         self.der = None
         self.izq  = None
     
-def match(tokenActual):
+def match(tokensActual):
     global ig
-    global token
-    if token[ig] == tokenActual:
-        if ig < len(token)-1:
+    global tokens
+    if tokens[ig] == tokensActual:
+        if ig < len(tokens)-1:
             ig += 1
     else:
         error()
 
 def expresion():
     global ig
-    global token
+    global tokens
+    nuevo = Arbol()
+    temp = expresion_simple()
+    if tokens[ig] == '<=' or tokens[ig] == '<' or tokens[ig] == '>' or tokens[ig] == '>=' or tokens[ig] == '=' or tokens[ig] == '!=':
+        if tokens[ig] == '<=':
+            match('<=')  
+            nuevo.nombre = "<="
+            nuevo.izq = temp
+            nuevo.der = expresion_simple()
+            if temp.dato <= nuevo.der.dato:
+                nuevo.dato = True
+            else:
+                nuevo.dato = False
+            temp = nuevo
+        elif tokens[ig] == '<':
+            match('<')  
+            nuevo.nombre = "<"
+            nuevo.izq = temp
+            nuevo.der = expresion_simple()
+            if temp.dato < nuevo.der.dato:
+                nuevo.dato = True
+            else:
+                nuevo.dato = False
+            temp = nuevo
+        elif tokens[ig] == '>':
+            match('>')  
+            nuevo.nombre = ">"
+            nuevo.izq = temp
+            nuevo.der = expresion_simple()
+            if temp.dato > nuevo.der.dato:
+                nuevo.dato = True
+            else:
+                nuevo.dato = False
+            temp = nuevo
+        elif tokens[ig] == '>=':
+            match('>=')
+            nuevo.nombre = ">="
+            nuevo.izq = temp
+            nuevo.der = expresion_simple()
+            if temp.dato >= nuevo.der.dato:
+                nuevo.dato = True
+            else:
+                nuevo.dato = False
+            temp = nuevo
+        elif tokens[ig] == '=':
+            match('=')
+            nuevo.nombre = "="
+            nuevo.izq = temp
+            nuevo.der = expresion_simple()
+            if temp.dato == nuevo.der.dato:
+                nuevo.dato = True
+            else:
+                nuevo.dato = False
+            temp = nuevo
+        elif tokens[ig] == '!=':
+            match('!=')
+            nuevo.nombre = "!="
+            nuevo.izq = temp
+            nuevo.der = expresion_simple()
+            if temp.dato != nuevo.der.dato:
+                nuevo.dato = True
+            else:
+                nuevo.dato = False
+            temp = nuevo
+    return temp
+
+def expresion_simple():
+    global ig
+    global tokens
     nuevo = Arbol()
     temp = termino()
-    while(token[ig] == '+' or token[ig] == '-'):
-        if token[ig] == '+':
+    while(tokens[ig] == '+' or tokens[ig] == '-'):
+        if tokens[ig] == '+':
             match('+')  
             nuevo.nombre = "+"
             nuevo.izq = temp
@@ -31,7 +99,7 @@ def expresion():
             nuevo.der = termino()
             nuevo.dato += nuevo.der.dato
             temp = nuevo
-        elif token[ig] == '-':
+        elif tokens[ig] == '-':
             match('-') 
             nuevo.nombre = "-"
             nuevo.izq = temp
@@ -43,11 +111,11 @@ def expresion():
 
 def termino():
     global ig
-    global token
+    global tokens
     nuevo = Arbol()
     temp = factor()
-    while(token[ig] == '*' or token[ig] =='/' or token[ig] == '%'):
-        if token[ig] == '*':
+    while(tokens[ig] == '*' or tokens[ig] =='/' or tokens[ig] == '%'):
+        if tokens[ig] == '*':
             match('*') 
             nuevo.nombre = "*"
             nuevo.izq = temp
@@ -55,7 +123,7 @@ def termino():
             nuevo.der = factor()
             nuevo.dato *= nuevo.der.dato
             temp = nuevo
-        elif token == '/':
+        elif tokens == '/':
             match('/')  
             nuevo.nombre = "/"
             nuevo.izq = temp
@@ -63,7 +131,7 @@ def termino():
             nuevo.der = factor()
             nuevo.dato /= nuevo.der.dato
             temp = nuevo
-        elif token == '%':
+        elif tokens == '%':
             match('%')  
             nuevo.nombre = "%"
             nuevo.izq = temp
@@ -75,10 +143,10 @@ def termino():
 
 def factor():
     global ig
-    global token
+    global tokens
     nuevo = Arbol()
     temp = fin()
-    while(token[ig] == '^'):
+    while(tokens[ig] == '^'):
         match('^')
         nuevo.nombre = "^"
         nuevo.izq = temp
@@ -90,16 +158,16 @@ def factor():
 
 def fin():
     global ig
-    global token
+    global tokens
     temp= Arbol()
-    if token[ig] == '(':
+    if tokens[ig] == '(':
         match('(')
         temp = expresion()
         match(')')
-    elif token[ig].isdigit():
+    elif tokens[ig].isdigit():
         temp.nombre = "Factor"
-        temp.dato = int (token[ig])
-        if ig < len(token)-1:
+        temp.dato = int (tokens[ig])
+        if ig < len(tokens)-1:
             ig += 1
     else:
         error()
