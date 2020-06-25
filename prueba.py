@@ -9,20 +9,14 @@ token1 = Token()
 token2 = Token()
 token3 = Token()
 token4 = Token()
-token0.token = "var"
-token0.tokenType = "identifier"
+token0.token = "cin"
+token0.tokenType = "restricted_word"
 tokens.append(token0)
-token1.token = ":="
-token1.tokenType = "operator"
+token1.token = "var"
+token1.tokenType = "Identifier"
 tokens.append(token1)
-token2.token = "4"
-token2.tokenType = "integer"
-tokens.append(token2)
-token3.token = "+"
-token3.tokenType = "operator"
-tokens.append(token3)
-token4.token = "2"
-token4.tokenType = "integer"
+token4.token = ";"
+token4.tokenType = "end_sentence"
 tokens.append(token4)
 
 ig = 0
@@ -32,6 +26,7 @@ class Arbol(object):
         self.nombre  = None
         self.dato  = None
         self.hijo = [None,None,None]
+        self.sibling = []
     
 def match(tokensActual):
     global ig
@@ -42,27 +37,93 @@ def match(tokensActual):
     else:
         error()
 
+def programa():
+    global ig
+    global tokens
+    temp = Arbol()
+    temp.nombre = "Main"
+    match('main')
+    match('{')
+    temp.hijo[0] = lista_declaracion()
+    temp.hijo[1] = lista_sentencias()
+    match('}')
+    return temp
+
+def lista_declaracion():
+    global ig
+    global tokens
+    temp = Arbol()
+    temp.nombre = "Lista Declaracion"
+    var = ";"
+    while(var == ";"):
+        match(';')
+        temp.sibling.append(declaracion())
+        var = tokens[ig].token 
+    return tem
+
+def declaracion():
+    global ig
+    global tokens
+    temp = Arbol()
+    temp.nombre = "Declaracion"
+    temp.hijo[0] = tipo()
+    temp.hijo[1] = lista_variables()
+    return temp
+
+def tipo():
+    global ig
+    global tokens
+    if tokens[ig].token == "int":
+        match('int')
+    if tokens[ig].token == "float":
+        match('float')
+    if tokens[ig].token == "bool":
+        match('bool')
+
+def lista_variables():
+    global ig
+    global tokens
+    temp = Arbol()
+    temp.nombre = "Lista variables"
+    temp.sibling.append(fin())
+    while(tokens[ig].token == ","):
+        match(',')
+        temp.sibling.append(fin())
+    return temp
+
 def lista_sentencias():
     global ig
     global tokens
     temp = Arbol()
-    temp.nombre = "Lista de sentencias"
+    temp.nombre = "Lista Sentencias"
+    temp.hijo[0] = sentencia()
+    if tokens[ig].token == ';':
+        match(';')
+        temp.hijo[1] = lista_sentencias()
+    return temp
     
-
 def sentencia():
     global ig
     global tokens
     temp = Arbol()
     temp.nombre = "Sentencia"
     if tokens[ig].token == 'seleccion' or tokens[ig].token == 'iteracion' or tokens[ig].token == 'repetecion' or tokens[ig].token == 'sent_cin' or tokens[ig].token == 'sent_cout' or tokens[ig].token == 'bloque' or tokens[ig].token == 'asignacion':
-        if tokens[ig].token == 'seleccion': temp.hijo[0] = seleccion()
-        elif tokens[ig].token == 'iteracion': temp.hijo[0] = seleccion()
-        elif tokens[ig].token == 'repeticion': temp.hijo[0] = seleccion()
-        elif tokens[ig].token == 'sent_cin': temp.hijo[0] = seleccion()
-        elif tokens[ig].token == 'sent_cout': temp.hijo[0] = seleccion()
-        elif tokens[ig].token == 'bloque': temp.hijo[0] = seleccion()
-        elif tokens[ig].token == 'asignacion': temp.hijo[0] = seleccion()
-    else: error()
+        if tokens[ig].token == 'seleccion':
+            temp.hijo[0] = seleccion()
+        elif tokens[ig].token == 'iteracion':
+            temp.hijo[0] = iteracion()
+        elif tokens[ig].token == 'repeticion':
+            temp.hijo[0] = repeticion()
+        elif tokens[ig].token == 'sent_cin':
+            temp.hijo[0] = sent_cin()
+        elif tokens[ig].token == 'sent_cout':
+            temp.hijo[0] = sent_cout()
+        elif tokens[ig].token == 'bloque':
+            temp.hijo[0] = bloque()
+        elif tokens[ig].token == 'asignacion':
+            temp.hijo[0] = asignacion()
+    else:
+        error()
     return temp
 
 def seleccion():
@@ -82,7 +143,6 @@ def seleccion():
     match('end')
     return temp
 
-
 def iteracion():
     global ig
     global tokens
@@ -99,7 +159,7 @@ def repeticion():
     global ig
     global tokens
     temp = Arbol()
-    temp.nombre = "Repeticion"
+    temp.nombre = "Repeat"
     match('do')
     temp.hijo[0] = bloque()
     match('while')
@@ -112,11 +172,11 @@ def repeticion():
 def sent_cin():
     global ig
     global tokens
-    nuevo = Arbol()
     temp = Arbol()
+    nuevo = Arbol()
     temp.nombre = "Cin"
     match('cin')
-    nuevo.nombre = "identifier"
+    nuevo.nombre = "Indentifier"
     nuevo.dato = tokens[ig].token
     temp.hijo[0] = nuevo
     if ig < len(tokens)-1:
@@ -176,48 +236,60 @@ def expresion():
             nuevo.nombre = "<="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
-            if (temp.dato <= nuevo.hijo[1].dato): nuevo.dato = True
-            else: nuevo.dato = False
+            if (temp.dato <= nuevo.hijo[1].dato): 
+                nuevo.dato = True
+            else: 
+                nuevo.dato = False
             temp = nuevo
         elif tokens[ig].token == '<':
             match('<')  
             nuevo.nombre = "<"
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
-            if (temp.dato < nuevo.hijo[1].dato): nuevo.dato = True
-            else: nuevo.dato = False
+            if (temp.dato < nuevo.hijo[1].dato): 
+                nuevo.dato = True
+            else: 
+                nuevo.dato = False
             temp = nuevo
         elif tokens[ig].token == '>':
             match('>')  
             nuevo.nombre = ">"
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
-            if (temp.dato > nuevo.hijo[1].dato): nuevo.dato = True
-            else: nuevo.dato = False
+            if (temp.dato > nuevo.hijo[1].dato): 
+                nuevo.dato = True
+            else: 
+                nuevo.dato = False
             temp = nuevo
         elif tokens[ig].token == '>=':
             match('>=')  
             nuevo.nombre = ">="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
-            if (temp.dato >= nuevo.hijo[1].dato): nuevo.dato = True
-            else: nuevo.dato = False
+            if (temp.dato >= nuevo.hijo[1].dato): 
+                nuevo.dato = True
+            else: 
+                nuevo.dato = False
             temp = nuevo
         elif tokens[ig].token == '=':
             match('=')  
             nuevo.nombre = "="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
-            if (temp.dato == nuevo.hijo[1].dato): nuevo.dato = True
-            else: nuevo.dato = False
+            if (temp.dato == nuevo.hijo[1].dato): 
+                nuevo.dato = True
+            else: 
+                nuevo.dato = False
             temp = nuevo
         elif tokens[ig].token == '!=':
             match('!=')  
             nuevo.nombre = "!="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
-            if (temp.dato != nuevo.hijo[1].dato): nuevo.dato = True
-            else: nuevo.dato = False
+            if (temp.dato != nuevo.hijo[1].dato): 
+                nuevo.dato = True
+            else: 
+                nuevo.dato = False
             temp = nuevo
     return temp
 
@@ -296,7 +368,7 @@ def fin():
     global ig
     global tokens
     temp = Arbol()
-    if tokens[ig].tokenType == 'special_character':
+    if tokens[ig].tokenType == 'special_caracter':
         match('(')
         temp = expresion()
         match(')')
@@ -329,9 +401,7 @@ def verArbol(arbol):
 
 if __name__== "__main__":
     raiz = Arbol()
-    raiz = asignacion()
+    raiz = sent_cin()
     print("Resultado: " + str(raiz.dato))
     verArbol(raiz)
-    #for i in [0,1,2,3,4]:
-    #    print(tokens[i].token + ": " + tokens[i].tokenType)
     
