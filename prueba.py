@@ -9,15 +9,96 @@ token1 = Token()
 token2 = Token()
 token3 = Token()
 token4 = Token()
-token0.token = "cin"
+token5 = Token()
+token6 = Token()
+token7 = Token()
+token8 = Token()
+token9 = Token()
+token10 = Token()
+token11 = Token()
+token12 = Token()
+token13 = Token()
+token14 = Token()
+token15 = Token()
+token16 = Token()
+token17 = Token()
+token18 = Token()
+
+token0.token = "if"
 token0.tokenType = "restricted_word"
 tokens.append(token0)
-token1.token = "var"
-token1.tokenType = "Identifier"
+
+token1.token = "("
+token1.tokenType = "special_character"
 tokens.append(token1)
-token4.token = ";"
-token4.tokenType = "end_sentence"
+
+token2.token = "4"
+token2.tokenType = "integer"
+tokens.append(token2)
+
+token3.token = "<"
+token3.tokenType = "operator"
+tokens.append(token3)
+
+token4.token = "5"
+token4.tokenType = "integer"
 tokens.append(token4)
+
+token5.token = ")"
+token5.tokenType = "special_character"
+tokens.append(token5)
+
+token6.token = "then"
+token6.tokenType = "restricted_word"
+tokens.append(token6)
+
+token7.token = "{"
+token7.tokenType = "special_character"
+tokens.append(token7)
+
+token8.token = "}"
+token8.tokenType = "special_character"
+tokens.append(token8)
+
+token9.token = "end"
+token9.tokenType = "restricted_word"
+tokens.append(token9)
+
+token10.token = "while"
+token10.tokenType = "restricted_word"
+tokens.append(token10)
+
+token11.token = "("
+token11.tokenType = "special_character"
+tokens.append(token11)
+
+token12.token = "4"
+token12.tokenType = "integer"
+tokens.append(token12)
+
+token13.token = ")"
+token13.tokenType = "special_character"
+tokens.append(token13)
+
+token14.token = "{"
+token14.tokenType = "special_character"
+tokens.append(token14)
+
+token15.token = "}"
+token15.tokenType = "special_character"
+tokens.append(token15)
+
+token16.token = "cout"
+token16.tokenType = "restricted_word"
+tokens.append(token16)
+
+token17.token = "var"
+token17.tokenType = "identifier"
+tokens.append(token17)
+
+token18.token = ";"
+token18.tokenType = "end_sentence"
+tokens.append(token18)
 
 ig = 0
 
@@ -36,7 +117,7 @@ def match(tokensActual):
             ig += 1
     else:
         error()
-
+'''
 def programa():
     global ig
     global tokens
@@ -59,7 +140,7 @@ def lista_declaracion():
         match(';')
         temp.sibling.append(declaracion())
         var = tokens[ig].token 
-    return tem
+    return temp
 
 def declaracion():
     global ig
@@ -90,41 +171,40 @@ def lista_variables():
         match(',')
         temp.sibling.append(fin())
     return temp
-
+'''
 def lista_sentencias():
     global ig
     global tokens
     temp = Arbol()
     temp.nombre = "Lista Sentencias"
-    temp.hijo[0] = sentencia()
-    if tokens[ig].token == ';':
-        match(';')
-        temp.hijo[1] = lista_sentencias()
+    temp.sibling.append(sentencia())
+    while temp.sibling[len(temp.sibling)-1] != None:
+        temp.sibling.append(sentencia())
     return temp
     
 def sentencia():
     global ig
     global tokens
-    temp = Arbol()
-    temp.nombre = "Sentencia"
-    if tokens[ig].token == 'seleccion' or tokens[ig].token == 'iteracion' or tokens[ig].token == 'repetecion' or tokens[ig].token == 'sent_cin' or tokens[ig].token == 'sent_cout' or tokens[ig].token == 'bloque' or tokens[ig].token == 'asignacion':
-        if tokens[ig].token == 'seleccion':
+    if tokens[ig].token == 'if' or tokens[ig].token == 'while' or tokens[ig].token == 'do' or tokens[ig].token == 'cin' or tokens[ig].token == 'cout' or tokens[ig].token == '{' or tokens[ig].tokenType == 'identifier':
+        temp = Arbol()
+        temp.nombre = "Sentencia"
+        if tokens[ig].token == 'if':
             temp.hijo[0] = seleccion()
-        elif tokens[ig].token == 'iteracion':
+        elif tokens[ig].token == 'while':
             temp.hijo[0] = iteracion()
-        elif tokens[ig].token == 'repeticion':
+        elif tokens[ig].token == 'do':
             temp.hijo[0] = repeticion()
-        elif tokens[ig].token == 'sent_cin':
+        elif tokens[ig].token == 'cin':
             temp.hijo[0] = sent_cin()
-        elif tokens[ig].token == 'sent_cout':
+        elif tokens[ig].token == 'cout':
             temp.hijo[0] = sent_cout()
-        elif tokens[ig].token == 'bloque':
+        elif tokens[ig].token == '{':
             temp.hijo[0] = bloque()
-        elif tokens[ig].token == 'asignacion':
+        elif tokens[ig].tokenType == 'identifier':
             temp.hijo[0] = asignacion()
-    else:
-        error()
-    return temp
+        return temp
+    #else:
+    #    error()
 
 def seleccion():
     global ig
@@ -142,7 +222,7 @@ def seleccion():
         temp.hijo[2] = bloque()
     match('end')
     return temp
-
+    
 def iteracion():
     global ig
     global tokens
@@ -176,7 +256,7 @@ def sent_cin():
     nuevo = Arbol()
     temp.nombre = "Cin"
     match('cin')
-    nuevo.nombre = "Indentifier"
+    nuevo.nombre = "identifier"
     nuevo.dato = tokens[ig].token
     temp.hijo[0] = nuevo
     if ig < len(tokens)-1:
@@ -383,6 +463,8 @@ def fin():
     elif tokens[ig].tokenType == "identifier":
         temp.nombre = tokens[ig].tokenType
         temp.dato = tokens[ig].token
+        if ig < len(tokens)-1:
+            ig += 1
     else:
         error()
     return temp
@@ -394,14 +476,15 @@ def verArbol(arbol):
     if(arbol != None):
         print("Nodo-> " + arbol.nombre)
         print("Valor-> " + str(arbol.dato))
+        for s in arbol.sibling:
+            verArbol(s)
         verArbol(arbol.hijo[0])
         verArbol(arbol.hijo[1])
+        verArbol(arbol.hijo[2])
     return
 
 
 if __name__== "__main__":
-    raiz = Arbol()
-    raiz = sent_cin()
-    print("Resultado: " + str(raiz.dato))
+    raiz = lista_sentencias()
     verArbol(raiz)
     
