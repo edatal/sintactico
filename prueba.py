@@ -24,81 +24,53 @@ token16 = Token()
 token17 = Token()
 token18 = Token()
 
-token0.token = "if"
+token0.token = "main"
 token0.tokenType = "restricted_word"
 tokens.append(token0)
 
-token1.token = "("
+token1.token = "{"
 token1.tokenType = "special_character"
 tokens.append(token1)
 
-token2.token = "4"
-token2.tokenType = "integer"
+token2.token = "int"
+token2.tokenType = "restricted_word"
 tokens.append(token2)
 
-token3.token = "<"
-token3.tokenType = "operator"
+token3.token = "a"
+token3.tokenType = "identifier"
 tokens.append(token3)
 
-token4.token = "5"
-token4.tokenType = "integer"
+token4.token = ";"
+token4.tokenType = "end_sentence"
 tokens.append(token4)
 
-token5.token = ")"
-token5.tokenType = "special_character"
+token5.token = "float"
+token5.tokenType = "restricted_word"
 tokens.append(token5)
 
-token6.token = "then"
-token6.tokenType = "restricted_word"
+token6.token = "c"
+token6.tokenType = "identifier"
 tokens.append(token6)
 
-token7.token = "{"
-token7.tokenType = "special_character"
+token7.token = ";"
+token7.tokenType = "end_sentence"
 tokens.append(token7)
 
-token8.token = "}"
-token8.tokenType = "special_character"
+token8.token = "cout"
+token8.tokenType = "restricted_word"
 tokens.append(token8)
 
-token9.token = "end"
-token9.tokenType = "restricted_word"
+token9.token = "4"
+token9.tokenType = "integer"
 tokens.append(token9)
 
-token10.token = "while"
-token10.tokenType = "restricted_word"
+token10.token = ";"
+token10.tokenType = "end_sentence"
 tokens.append(token10)
 
-token11.token = "("
+token11.token = "}"
 token11.tokenType = "special_character"
 tokens.append(token11)
-
-token12.token = "4"
-token12.tokenType = "integer"
-tokens.append(token12)
-
-token13.token = ")"
-token13.tokenType = "special_character"
-tokens.append(token13)
-
-token14.token = "{"
-token14.tokenType = "special_character"
-tokens.append(token14)
-
-token15.token = "}"
-token15.tokenType = "special_character"
-tokens.append(token15)
-
-token16.token = "cout"
-token16.tokenType = "restricted_word"
-tokens.append(token16)
-
-token17.token = "var"
-token17.tokenType = "identifier"
-tokens.append(token17)
-
-token18.token = ";"
-token18.tokenType = "end_sentence"
-tokens.append(token18)
 
 ig = 0
 
@@ -116,8 +88,9 @@ def match(tokensActual):
         if ig < len(tokens)-1:
             ig += 1
     else:
+        print(tokens[ig].token)
         error()
-'''
+
 def programa():
     global ig
     global tokens
@@ -127,7 +100,6 @@ def programa():
     match('{')
     temp.hijo[0] = lista_declaracion()
     temp.hijo[1] = lista_sentencias()
-    match('}')
     return temp
 
 def lista_declaracion():
@@ -135,31 +107,38 @@ def lista_declaracion():
     global tokens
     temp = Arbol()
     temp.nombre = "Lista Declaracion"
-    var = ";"
-    while(var == ";"):
-        match(';')
+    temp.sibling.append(declaracion())
+    match(';')
+    while (temp.sibling[len(temp.sibling)-1] != None):
         temp.sibling.append(declaracion())
-        var = tokens[ig].token 
+        match(';')
     return temp
 
 def declaracion():
     global ig
     global tokens
-    temp = Arbol()
-    temp.nombre = "Declaracion"
-    temp.hijo[0] = tipo()
-    temp.hijo[1] = lista_variables()
-    return temp
+    if (tokens[ig].token == 'int' or tokens[ig].token == 'float' or tokens[ig].token == 'bool'):
+        temp = Arbol()
+        temp.nombre = "Declaracion"
+        temp.hijo[0] = tipo()
+        temp.hijo[1] = lista_variables()
+        return temp
 
 def tipo():
     global ig
     global tokens
+    temp = Arbol()
+    temp.nombre = "Tipo"
     if tokens[ig].token == "int":
+        temp.dato = tokens[ig].token
         match('int')
-    if tokens[ig].token == "float":
+    elif tokens[ig].token == "float":
+        temp.dato = tokens[ig].token
         match('float')
-    if tokens[ig].token == "bool":
+    elif tokens[ig].token == "bool":
+        temp.dato = tokens[ig].token
         match('bool')
+    return temp
 
 def lista_variables():
     global ig
@@ -171,7 +150,7 @@ def lista_variables():
         match(',')
         temp.sibling.append(fin())
     return temp
-'''
+
 def lista_sentencias():
     global ig
     global tokens
@@ -485,6 +464,6 @@ def verArbol(arbol):
 
 
 if __name__== "__main__":
-    raiz = lista_sentencias()
+    raiz = programa()
     verArbol(raiz)
     
