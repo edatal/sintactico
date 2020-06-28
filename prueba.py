@@ -111,7 +111,8 @@ def lista_declaracion():
     match(';')
     while (temp.sibling[len(temp.sibling)-1] != None):
         temp.sibling.append(declaracion())
-        match(';')
+        if temp.sibling[len(temp.sibling)-1] != None:
+            match(';')
     return temp
 
 def declaracion():
